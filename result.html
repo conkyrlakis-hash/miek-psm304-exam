@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="el">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Αποτέλεσμα · ΜΙΕΕΚ PSM 304</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="top">
+  <div class="course">ΜΙΕΕΚ · PSM 304 Διαχείριση Λειτουργιών Εφοδιαστικής Αλυσίδας</div>
+  <div class="teacher">Εκπαιδεύτρια: <span translate="no">Ελένη Μιχαηλίδου</span></div>
+</header>
+<main>
+  <h1>Αποτέλεσμα</h1>
+  <div class="card soft">
+    <div class="big" id="score">–</div>
+    <div id="p100" class="sub"></div>
+    <div id="best" class="sub"></div>
+  </div>
+  <div id="later" class="msg ok" hidden></div>
+  <div class="row"><a class="btn green" href="home.html">Αρχική</a>
+    <button id="logout" class="ghost">Αποσύνδεση</button></div>
+</main>
+<script src="common.js"></script>
+<script>
+(function () {
+  var M = window.MIEK;
+  if (!M.requireLogin()) return;
+  var raw = localStorage.getItem('miek304_result');
+  if (!raw) { location.href = 'home.html'; return; }
+  var r = JSON.parse(raw);
+  M.$('logout').addEventListener('click', M.logout);
+  M.$('score').textContent = r.score + ' / ' + r.total;
+  M.$('p100').textContent = 'Στα 100: ' + r.percent;
+  if (r.best_score !== null && r.best_score !== undefined) M.$('best').textContent = 'Ο υψηλότερος βαθμός σας μέχρι τώρα: ' + r.best_score + ' / ' + r.total;
+  // while the exam is open the server sends only the score: the correct answers come after closes_at
+  var later = M.$('later');
+  if (r.review_allowed !== false) {
+    later.hidden = false;
+    later.textContent = 'Οι σωστές απαντήσεις θα εμφανιστούν μετά τις ' + M.fmtDate(r.closes_at) + '.';
+  }
+})();
+</script>
+</body>
+</html>

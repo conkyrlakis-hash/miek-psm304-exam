@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="el">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Σύνδεση · ΜΙΕΕΚ PSM 304</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="top">
+  <div class="course">ΜΙΕΕΚ · PSM 304 Διαχείριση Λειτουργιών Εφοδιαστικής Αλυσίδας</div>
+  <div class="teacher">Εκπαιδεύτρια: <span translate="no">Ελένη Μιχαηλίδου</span></div>
+</header>
+<main>
+  <h1>Σύνδεση</h1>
+  <p class="sub">Βάλτε το email και τον κωδικό με τα οποία εγγραφήκατε.</p>
+  <form id="f" class="card" novalidate>
+    <label for="email">Email
+      <input id="email" type="email" autocomplete="email" inputmode="email" required>
+    </label>
+    <label for="pw">Κωδικός
+      <input id="pw" type="password" autocomplete="current-password" required>
+    </label>
+    <button id="go" type="submit">Σύνδεση</button>
+    <div id="out" class="msg" hidden></div>
+  </form>
+  <p>Δεν έχετε λογαριασμό; <a class="link" href="index.html">Εγγραφή</a></p>
+</main>
+<script src="common.js"></script>
+<script>
+(function () {
+  var M = window.MIEK, f = M.$('f'), out = M.$('out'), go = M.$('go');
+  f.addEventListener('submit', function (e) {
+    e.preventDefault();
+    var email = M.$('email').value.trim(), pw = M.$('pw').value;
+    if (!email || !pw) return M.showMsg(out, false, 'Συμπληρώστε email και κωδικό.');
+    go.disabled = true;
+    M.login(email, pw)
+      .then(function (token) { M.setToken(token); location.href = 'home.html'; })
+      .catch(function (err) { go.disabled = false; M.showMsg(out, false, err.message); });
+  });
+})();
+</script>
+</body>
+</html>

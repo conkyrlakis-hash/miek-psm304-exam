@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="el">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Εγγραφή · ΜΙΕΕΚ PSM 304</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="top">
+  <div class="course">ΜΙΕΕΚ · PSM 304 Διαχείριση Λειτουργιών Εφοδιαστικής Αλυσίδας</div>
+  <div class="teacher">Εκπαιδεύτρια: <span translate="no">Ελένη Μιχαηλίδου</span></div>
+</header>
+<main>
+  <h1>Εγγραφή για το διαγώνισμα</h1>
+  <p class="sub">Συμπληρώστε τα στοιχεία σας για να δώσετε το ενδιάμεσο διαγώνισμα. Θα συνδεθείτε αυτόματα.</p>
+  <form id="f" class="card" novalidate>
+    <label for="first">Όνομα
+      <input id="first" type="text" autocomplete="given-name" maxlength="80" required>
+    </label>
+    <label for="last">Επώνυμο
+      <input id="last" type="text" autocomplete="family-name" maxlength="80" required>
+    </label>
+    <label for="email">Email
+      <input id="email" type="email" autocomplete="email" inputmode="email" maxlength="200" required>
+    </label>
+    <label for="pw">Κωδικός (τουλάχιστον 6 χαρακτήρες)
+      <input id="pw" type="password" autocomplete="new-password" minlength="6" required>
+    </label>
+    <label for="pw2">Κωδικός ξανά
+      <input id="pw2" type="password" autocomplete="new-password" minlength="6" required>
+    </label>
+    <label class="consent" for="consent">
+      <input id="consent" type="checkbox" required>
+      <span>Τα στοιχεία σας χρησιμοποιούνται μόνο για το διαγώνισμα και διαγράφονται στο τέλος του εξαμήνου.</span>
+    </label>
+    <button id="go" type="submit">Εγγραφή</button>
+    <div id="out" class="msg" hidden></div>
+  </form>
+  <p>Έχετε ήδη λογαριασμό; <a class="link" href="login.html">Σύνδεση</a></p>
+</main>
+<script src="common.js"></script>
+<script>
+(function () {
+  var M = window.MIEK, f = M.$('f'), out = M.$('out'), go = M.$('go');
+  if (M.getToken()) {
+    out.hidden = false; out.className = 'msg ok';
+    out.innerHTML = 'Είστε ήδη συνδεδεμένος/η. <a class="link" href="home.html">Συνέχεια</a>';
+  }
+  f.addEventListener('submit', function (e) {
+    e.preventDefault();
+    var first = M.$('first').value.trim(), last = M.$('last').value.trim(), email = M.$('email').value.trim();
+    var pw = M.$('pw').value, pw2 = M.$('pw2').value;
+    if (!first || !last) return M.showMsg(out, false, 'Συμπληρώστε όνομα και επώνυμο.');
+    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return M.showMsg(out, false, 'Ελέγξτε το email σας.');
+    if (pw.length < 6) return M.showMsg(out, false, 'Ο κωδικός πρέπει να έχει τουλάχιστον 6 χαρακτήρες.');
+    if (pw !== pw2) return M.showMsg(out, false, 'Οι δύο κωδικοί δεν ταιριάζουν.');
+    if (!M.$('consent').checked) return M.showMsg(out, false, 'Χρειάζεται να συμφωνήσετε με τη χρήση των στοιχείων σας.');
+    go.disabled = true;
+    M.api('miek_psm304_register', { p_first: first, p_last: last, p_email: email, p_password: pw })
+      .then(function (token) { M.setToken(token); location.href = 'home.html'; })
+      .catch(function (err) { go.disabled = false; M.showMsg(out, false, err.message); });
+  });
+})();
+</script>
+</body>
+</html>

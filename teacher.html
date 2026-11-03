@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="el">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Εκπαιδεύτρια · ΜΙΕΕΚ PSM 304</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="top">
+  <div class="course">ΜΙΕΕΚ · PSM 304 Διαχείριση Λειτουργιών Εφοδιαστικής Αλυσίδας</div>
+  <div class="teacher">Εκπαιδεύτρια: <span translate="no">Ελένη Μιχαηλίδου</span></div>
+</header>
+<main style="max-width:900px">
+  <h1>Σελίδα εκπαιδεύτρια</h1>
+
+  <div id="loginBox">
+    <p class="sub">Συνδεθείτε με το email που έχει δηλωθεί ως email εκπαιδεύτριας.</p>
+    <form id="lf" class="card" novalidate style="max-width:420px">
+      <label for="email">Email <input id="email" type="email" autocomplete="email" required></label>
+      <label for="pw">Κωδικός <input id="pw" type="password" autocomplete="current-password" required></label>
+      <button id="lgo" type="submit">Σύνδεση</button>
+    </form>
+  </div>
+
+  <div id="panel" hidden>
+    <div class="row" style="max-width:520px">
+      <button id="csv" class="green">Λήψη CSV</button>
+      <button id="refresh" class="ghost">Ανανέωση</button>
+      <button id="out" class="ghost">Αποσύνδεση</button>
+    </div>
+    <p class="sub" id="count"></p>
+    <div class="card scroll"><table id="tbl"></table></div>
+
+    <h2>Επαναφορά κωδικού φοιτητή</h2>
+    <form id="rf" class="card" novalidate style="max-width:420px">
+      <label for="remail">Email φοιτητή <input id="remail" type="email" required></label>
+      <label for="rpw">Νέος κωδικός (τουλάχιστον 6 χαρακτήρες) <input id="rpw" type="text" autocomplete="off" required></label>
+      <button type="submit">Αλλαγή κωδικού</button>
+    </form>
+  </div>
+  <div id="msg" class="msg err" hidden></div>
+  <p><a class="link" href="home.html">Αρχική φοιτητή</a></p>
+</main>
+<script src="common.js"></script>
+<script src="teacher.js"></script>
+</body>
+</html>

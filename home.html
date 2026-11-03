@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="el">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Αρχική · ΜΙΕΕΚ PSM 304</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="top">
+  <div class="course">ΜΙΕΕΚ · PSM 304 Διαχείριση Λειτουργιών Εφοδιαστικής Αλυσίδας</div>
+  <div class="teacher">Εκπαιδεύτρια: <span translate="no">Ελένη Μιχαηλίδου</span></div>
+</header>
+<main>
+  <h1 id="hello">Καλώς ήρθατε</h1>
+  <div id="err" class="msg err" hidden></div>
+
+  <div class="card soft">
+    <div class="sub">Ο βαθμός σας στο ενδιάμεσο (ο υψηλότερος)</div>
+    <div class="big" id="best">–</div>
+    <div class="sub" id="best100"></div>
+  </div>
+
+  <div class="card">
+    <strong>Διάστημα διαγωνίσματος</strong>
+    <p id="window">–</p>
+    <h2 style="margin-top:6px">Κανόνες</h2>
+    <ul class="rules">
+      <li>30 ερωτήσεις πολλαπλής επιλογής, με μία σωστή απάντηση η καθεμία.</li>
+      <li>Μπορείτε να το δώσετε ξανά όσο είναι ανοιχτό το διάστημα. Μετράει ο υψηλότερος βαθμός.</li>
+      <li>Κάθε φορά αλλάζουν οι ερωτήσεις και η σειρά τους. Οι σωστές απαντήσεις εμφανίζονται μετά το κλείσιμο.</li>
+    </ul>
+  </div>
+
+  <div class="row">
+    <button id="resume" class="ghost" hidden>Συνέχεια του διαγωνίσματος που ξεκινήσατε</button>
+    <button id="start" class="green" disabled>Έναρξη διαγωνίσματος</button>
+  </div>
+  <div id="left" class="small" style="margin-top:8px"></div>
+
+  <h2>Οι προσπάθειές σας</h2>
+  <div id="attempts" class="card"><span class="sub">Φόρτωση…</span></div>
+
+  <p><a id="tlink" class="link" href="teacher.html" hidden>Σελίδα εκπαιδεύτριας</a></p>
+  <div class="row"><button id="logout" class="ghost">Αποσύνδεση</button></div>
+</main>
+<script src="common.js"></script>
+<script src="home.js"></script>
+</body>
+</html>

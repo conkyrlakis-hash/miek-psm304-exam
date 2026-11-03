@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="el">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Τα λάθη σας · ΜΙΕΕΚ PSM 304</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="top">
+  <div class="course">ΜΙΕΕΚ · PSM 304 Διαχείριση Λειτουργιών Εφοδιαστικής Αλυσίδας</div>
+  <div class="teacher">Εκπαιδεύτρια: <span translate="no">Ελένη Μιχαηλίδου</span></div>
+</header>
+<main>
+  <h1>Τα λάθη σας</h1>
+  <div id="err" class="msg err" hidden></div>
+  <div class="card soft">
+    <div class="big" id="score">–</div>
+    <div id="p100" class="sub"></div>
+  </div>
+  <div class="row"><a class="btn green" href="home.html">Αρχική</a>
+    <button id="logout" class="ghost">Αποσύνδεση</button></div>
+  <div id="review"></div>
+</main>
+<script src="common.js"></script>
+<script>
+(function () {
+  var M = window.MIEK;
+  if (!M.requireLogin()) return;
+  M.$('logout').addEventListener('click', M.logout);
+  var id = new URLSearchParams(location.search).get('id');
+  if (!id) { location.href = 'home.html'; return; }
+  M.api('miek_psm304_review', { p_token: M.getToken(), p_attempt_id: id }).then(function (r) {
+    M.$('score').textContent = r.score + ' / ' + r.total;
+    M.$('p100').textContent = 'Στα 100: ' + r.percent + ' · Προσπάθεια της ' + M.fmtDate(r.submitted_at);
+    var box = M.$('review');
+    if (!r.review.length) { box.innerHTML = '<div class="msg ok">Όλες οι απαντήσεις σας ήταν σωστές.</div>'; return; }
+    var h = '<h2>Οι ερωτήσεις που χάσατε (' + r.review.length + ')</h2>';
+    r.review.forEach(function (x) {
+      h += '<div class="rev"><div><strong>Ερώτηση ' + x.n + '.</strong> ' + M.esc(x.q) + '</div>' +
+        '<div class="bad">Η απάντησή σας: ' + (x.chosen ? M.esc(x.chosen) : 'καμία απάντηση') + '</div>' +
+        '<div class="good">Σωστή απάντηση: ' + M.esc(x.correct) + '</div>' +
+        (x.explain ? '<div class="why">' + M.esc(x.explain) + '</div>' : '') + '</div>';
+    });
+    box.innerHTML = h;
+  }).catch(function (e) {
+    if (/έληξε/.test(e.message)) { M.clearToken(); location.href = 'login.html'; return; }
+    M.showMsg(M.$('err'), false, e.message);
+  });
+})();
+</script>
+</body>
+</html>
