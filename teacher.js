@@ -1,28 +1,47 @@
 (function () {
   var M = window.MIEK, KEY = 'miek304_teacher_token';
-  var rows = [], total = 30, sortKey = 'last_name', sortDir = 1;
+  var rows = [], total = 30, sortKey = 'rank', sortDir = 1;
   var COLS = [
-    { k: 'last_name', t: 'Επώνυμο' }, { k: 'first_name', t: 'Όνομα' }, { k: 'email', t: 'Email' },
-    { k: 'attempts', t: 'Προσπάθειες' }, { k: 'best_score', t: 'Καλύτερος βαθμός' }, { k: 'last_attempt', t: 'Τελευταία προσπάθεια' }
+    { k: 'rank', t: 'Σειρά' }, { k: 'last_name', t: 'Επώνυμο' }, { k: 'first_name', t: 'Όνομα' }, { k: 'email', t: 'Email' },
+    { k: 'attempts', t: 'Προσπάθειες' }, { k: 'best_score', t: 'Καλύτερος βαθμός' }, { k: 'out100', t: 'Στα 100' }, { k: 'last_attempt', t: 'Τελευταία προσπάθεια' }
   ];
 
   function msg(ok, text) { M.showMsg(M.$('msg'), ok, text); }
 
   function show(on) { M.$('loginBox').hidden = on; M.$('panel').hidden = !on; }
 
-  function load() {
-    M.$('msg').hidden = true;
-    return M.api('miek_psm304_teacher_results', { p_token: M.getToken(KEY) }).then(function (r) {
-      rows = r.students; total = r.total; show(true); draw();
-    }).catch(function (e) { M.clearToken(KEY); show(false); msg(false, e.message); });
+  function fetchResults() {
+    var token = M.getToken(KEY);
+    return Promise.all([
+      M.api('miek_psm304_teacher_results', { p_token: token }),
+      M.api('miek_psm304_me', { p_token: token })
+    ]).then(function (res) {
+      var r = res[0], mine = String(res[1].email || '').trim().toLowerCase();
+      total = r.total;
+      // the teacher's own trial run is not a student result
+      rows = M.rank(r.students.filter(function (s) { return String(s.email || '').trim().toLowerCase() !== mine; }), total);
+      return rows;
+    });
   }
 
+  // Only a dead session or a wrong account logs her out; a network blip must not.
+  function isAuthError(e) { return /έληξε|δικαίωμα/.test((e && e.message) || ''); }
+
+  function load() {
+    M.$('msg').hidden = true;
+    return fetchResults().then(function () { show(true); draw(); }).catch(function (e) {
+      if (isAuthError(e)) { M.clearToken(KEY); show(false); }
+      msg(false, e.message);
+    });
+  }
+
+  // students with no score always stay at the bottom, whichever way the column sorts
   function cmp(a, b) {
     var x = a[sortKey], y = b[sortKey];
-    if (x === null || x === undefined) x = (typeof y === 'number') ? -1 : '';
-    if (y === null || y === undefined) y = (typeof x === 'number') ? -1 : '';
-    if (typeof x === 'number' && typeof y === 'number') return (x - y) * sortDir;
-    return String(x).toLowerCase().localeCompare(String(y).toLowerCase(), 'el') * sortDir;
+    var xn = x === null || x === undefined, yn = y === null || y === undefined;
+    if (xn || yn) return xn && yn ? a.pos - b.pos : (xn ? 1 : -1);
+    if (typeof x === 'number' && typeof y === 'number') return ((x - y) * sortDir) || (a.pos - b.pos);
+    return (String(x).toLowerCase().localeCompare(String(y).toLowerCase(), 'el') * sortDir) || (a.pos - b.pos);
   }
 
   function draw() {
@@ -33,34 +52,41 @@
     });
     h += '</tr>';
     rows.forEach(function (r) {
-      h += '<tr><td>' + M.esc(r.last_name) + '</td><td>' + M.esc(r.first_name) + '</td><td>' + M.esc(r.email) + '</td><td>' +
-        r.attempts + '</td><td>' + (r.best_score === null ? '–' : r.best_score + ' / ' + total) + '</td><td>' +
-        M.esc(M.fmtDate(r.last_attempt)) + '</td></tr>';
+      var low = r.fail ? ' class="low"' : '';
+      h += '<tr><td>' + (r.rank === null ? '–' : r.rank) + '</td><td>' + M.esc(r.last_name) + '</td><td>' + M.esc(r.first_name) + '</td><td>' + M.esc(r.email) + '</td><td>' +
+        r.attempts + '</td><td' + low + '>' + (r.best_score === null ? '–' : r.best_score + ' / ' + total) + '</td><td' + low + '>' +
+        (r.out100 === null ? '–' : r.out100) + '</td><td>' + M.esc(M.fmtDate(r.last_attempt)) + '</td></tr>';
     });
     M.$('tbl').innerHTML = h;
     M.$('count').textContent = 'Φοιτητές: ' + rows.length;
     Array.prototype.forEach.call(M.$('tbl').querySelectorAll('th.sort'), function (th) {
       th.addEventListener('click', function () {
         var k = th.getAttribute('data-k');
-        if (sortKey === k) sortDir = -sortDir; else { sortKey = k; sortDir = 1; }
+        if (sortKey === k) sortDir = -sortDir; else { sortKey = k; sortDir = (k === 'best_score' || k === 'out100') ? -1 : 1; }
         draw();
       });
     });
   }
 
-  function csvCell(v) { return '"' + String(v === null || v === undefined ? '' : v).replace(/"/g, '""') + '"'; }
+  // Each export asks the server for fresh results. If that fails she sees the error, never old numbers.
+  function runExport(btn, build) {
+    var label = btn.textContent;
+    btn.disabled = true; btn.textContent = 'Περιμένετε...';
+    M.$('msg').hidden = true;
+    fetchResults()
+      .then(function (list) {
+        sortKey = 'rank'; sortDir = 1; draw();
+        return build(M.rank(list, total), total);
+      })
+      .catch(function (e) {
+        if (isAuthError(e)) { M.clearToken(KEY); show(false); }
+        msg(false, (e && e.message) || 'Δεν έγινε η εξαγωγή. Δοκιμάστε ξανά.');
+      })
+      .then(function () { btn.disabled = false; btn.textContent = label; });
+  }
 
-  M.$('csv').addEventListener('click', function () {
-    var lines = [COLS.map(function (c) { return csvCell(c.t); }).concat([csvCell('Στα 100')]).join(';')];
-    rows.forEach(function (r) {
-      lines.push([r.last_name, r.first_name, r.email, r.attempts, r.best_score === null ? '' : r.best_score,
-        M.fmtDate(r.last_attempt), r.best_score === null ? '' : Math.round(r.best_score * 100 / total)].map(csvCell).join(';'));
-    });
-    var blob = new Blob(['\uFEFF' + lines.join('\r\n')], { type: 'text/csv;charset=utf-8' });
-    var a = document.createElement('a');
-    a.href = URL.createObjectURL(blob); a.download = 'psm304-apotelesmata.csv';
-    document.body.appendChild(a); a.click(); document.body.removeChild(a);
-  });
+  M.$('pdf').addEventListener('click', function () { runExport(M.$('pdf'), window.MIEK_EXPORT.pdf); });
+  M.$('xlsx').addEventListener('click', function () { runExport(M.$('xlsx'), window.MIEK_EXPORT.xlsx); });
 
   M.$('refresh').addEventListener('click', load);
   M.$('out').addEventListener('click', function () { M.clearToken(KEY); show(false); });

@@ -36,6 +36,9 @@ table { border-collapse:collapse; width:100%; font-size:15px; }
 th, td { border-bottom:1px solid var(--line); padding:8px 6px; text-align:left; }
 th { color:var(--blue); }
 th.sort { cursor:pointer; user-select:none; }
+td.low { background:#c62828; color:#fff; font-weight:700; }
+#tbl td:nth-child(4) { overflow-wrap:anywhere; }
+#tbl td:nth-child(6), #tbl td:nth-child(7), #tbl td:nth-child(8) { white-space:nowrap; }
 .scroll { overflow-x:auto; }
 .progress { font-weight:700; color:var(--blue); margin-bottom:8px; }
 .bar { height:8px; background:var(--soft); border-radius:6px; overflow:hidden; margin-bottom:14px; }
