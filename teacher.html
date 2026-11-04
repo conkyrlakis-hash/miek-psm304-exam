@@ -25,14 +25,16 @@
   </div>
 
   <div id="panel" hidden>
-    <div class="row" style="max-width:720px">
+    <div class="row">
       <button id="pdf" class="green">Λήψη PDF</button>
       <button id="xlsx" class="green">Λήψη Excel</button>
+      <button id="allx" class="green">Όλες οι απαντήσεις (Excel)</button>
       <button id="refresh" class="ghost">Ανανέωση</button>
       <button id="out" class="ghost">Αποσύνδεση</button>
     </div>
     <p class="sub" id="count"></p>
     <div class="card scroll"><table id="tbl"></table></div>
+    <div id="detail" class="card" hidden></div>
 
     <h2>Επαναφορά κωδικού φοιτητή</h2>
     <form id="rf" class="card" novalidate style="max-width:420px">

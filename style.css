@@ -40,6 +40,12 @@ td.low { background:#c62828; color:#fff; font-weight:700; }
 #tbl td:nth-child(4) { overflow-wrap:anywhere; }
 #tbl td:nth-child(6), #tbl td:nth-child(7), #tbl td:nth-child(8) { white-space:nowrap; }
 .scroll { overflow-x:auto; }
+button.mini { min-height:36px; padding:5px 10px; font-size:14px; }
+.att { font-weight:700; margin:20px 0 6px; }
+.ans { min-width:680px; }
+.ans td { vertical-align:top; }
+.ans td.ok { color:var(--ok); font-weight:700; white-space:nowrap; }
+.ans td.no { color:var(--err); font-weight:700; white-space:nowrap; }
 .progress { font-weight:700; color:var(--blue); margin-bottom:8px; }
 .bar { height:8px; background:var(--soft); border-radius:6px; overflow:hidden; margin-bottom:14px; }
 .bar > i { display:block; height:100%; background:var(--green); }
