@@ -1,3 +1,8 @@
+/* Old address: send anyone who arrives on it to the course link. */
+if (location.hostname.endsWith('github.io')) {
+  location.replace('https://psm304-supply-chain.pages.dev' + location.pathname.replace('/miek-psm304-exam', '') + location.search);
+}
+
 /* Shared helpers: API (Supabase RPC or mock), token, dates, modal. */
 (function () {
   var CFG = {
